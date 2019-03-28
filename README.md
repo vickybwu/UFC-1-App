@@ -1,6 +1,8 @@
 # UFC Fighter Data Shiny App
 Marcus scraped the data from Fox Sports I built the App
+
 The scraped data is stored in the "ufcbasics.csv" file
+
 Fox UFC Stats Link: (https://www.foxsports.com/ufc/stats?weightclass=11&category=BASIC)
 
 ## You can launch the app on R by running: runGitHub( "UFC", "vickybwu") 
