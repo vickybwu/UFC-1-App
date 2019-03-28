@@ -6,4 +6,4 @@
 - Barplot of the fighter data you chose 
 
 
-![](name-of-giphy.gif)
+![](ufc_rshiny_gif.gif)
