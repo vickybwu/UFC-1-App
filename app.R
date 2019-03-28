@@ -1,5 +1,5 @@
 library(shiny)
-#library(shinythemes)
+library(shinythemes)
 library(readr)
 library(ggplot2)
 library(stringr)
@@ -7,10 +7,38 @@ library(dplyr)
 library(DT)
 library(tools)
 
+ufc_basics <- read.csv("/Users/VickyWu/Desktop/R datasets/UFC stats/ufcbasics.csv",
+                       blank.lines.skip = TRUE, na.strings=TRUE)
+
+#Strike Accuracy and Takedown Accuracy should be numerics instaead of factors
+#Coerce factors to numerics (first coerce to character and replace "%" and "." with " ")
+ufc_basics$Total.Strike.Accuracy<-gsub("%", "",as.character(ufc_basics$Total.Strike.Accuracy), fixed=TRUE)
+ufc_basics$Total.Strike.Accuracy<-gsub(".", "",as.character(ufc_basics$Total.Strike.Accuracy), fixed=TRUE)
+ufc_basics$Total.Strike.Accuracy<-gsub("-", "0", ufc_basics$Total.Strike.Accuracy, fixed=TRUE)
+#Now coerce the characters to numerics and divide the number by 1000
+ufc_basics$Total.Strike.Accuracy<-as.numeric(ufc_basics$Total.Strike.Accuracy)/10000
+
+#Do the same with takedown accuracy
+ufc_basics$Take.Down.Accuracy<-gsub("%", "", as.character(ufc_basics$Take.Down.Accuracy), fixed=TRUE)
+ufc_basics$Take.Down.Accuracy<-gsub(".", "", ufc_basics$Take.Down.Accuracy, fixed=TRUE)
+ufc_basics$Take.Down.Accuracy<-gsub("-", "0", ufc_basics$Take.Down.Accuracy, fixed=TRUE)
+#Now coerce the characters to numerics and divide the number by 1000
+ufc_basics$Take.Down.Accuracy<-as.numeric(ufc_basics$Take.Down.Accuracy)/10000
+
+#Coerce Name, Lastname and Firstname to characters
+ufc_basics$Name <- as.character(ufc_basics$Name)
+ufc_basics$Last.Name <- as.character(ufc_basics$Last.Name)
+ufc_basics$Firstst.Name<-as.character(ufc_basics$Firstst.Name)
+colnames(ufc_basics)[2] <- "Last.Name"
+colnames(ufc_basics)[3] <- "First.Name"
+colnames(ufc_basics)[10] <- "Pass"
+colnames(ufc_basics)[12] <- "Submission"
+
 # Define UI for application that plots features of movies
 ui <- fluidPage(
      #Add a theme
-     #theme=shinytheme("journal"),
+     theme=shinytheme("sandstone"),
+  
      # App title
      titlePanel("UFC Fighters Stats", windowTitle = "UFC Fighters"),
      
@@ -67,6 +95,9 @@ ui <- fluidPage(
                              label = "Show data table",
                              value = TRUE),
                
+               #Sliderinput for adjusting cex of labels in barplot
+               sliderInput(inputId = "cexSlider", label=h4("Adjust cex"), min=1, max=3,value=1),
+               
                # Built with Shiny by RStudio
                br(), br(),
                h5("Built with",
@@ -115,7 +146,6 @@ server <- function(input, output, session) {
                geom_point() +
                labs(x = x(),
                     y = y(),
-                    #color = toTitleCase(str_replace_all(input$z, "_", " ")),
                     title = toTitleCase(input$plot_title))
      })
      
@@ -137,20 +167,22 @@ server <- function(input, output, session) {
      #selected fighter stats
      output$selectedfightertable <- DT::renderDataTable(
           DT::datatable(data = ufc_basics[ufc_basics$Name==input$z,], 
-                        #options = list(pageLength = 10), 
                         rownames = FALSE)
      )
      
      #fighter scores barchart for selected fighter
      output$barchart <- renderPlot({
-          barplot(height=data.matrix(ufc_basics[ufc_basics$Name==input$z,c(5,7,9,10,11,12)]),
-                  main=paste(input$z,"scores"),
+          chosen<-ufc_basics[ufc_basics$Name==input$z,c(4,5,7,9,10,11,12)]
+          barchart<-barplot(height=as.matrix(chosen),
+                  main=paste(input$z,"stats"),
                   xlab="method",
-                  ylab="scores")
-          #text(x = barchart, y = scores, label = scores, pos = 3, cex = 0.8, col = "black")
-                  #color = "red")
-                    #title = toTitleCase(input$plot_title))
-     })
+                  ylab="scores",
+                  col="bisque3")
+          barchart
+          #axis(1)
+          text(x=c(0.6,1.8,3,4.2,5.4,6.6,7.8), y=250, 
+               labels=as.character(chosen[1,]), cex=input$cexSlider, col="black")
+})
      
      # Display data table tab only if show_data is checked
      observeEvent(input$show_data, {
