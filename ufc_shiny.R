@@ -7,6 +7,33 @@ library(dplyr)
 library(DT)
 library(tools)
 
+ufc_basics <- read.csv("/Users/VickyWu/Desktop/R datasets/UFC stats/ufcbasics.csv",
+                       blank.lines.skip = TRUE, na.strings=TRUE)
+
+#Strike Accuracy and Takedown Accuracy should be numerics instaead of factors
+#Coerce factors to numerics (first coerce to character and replace "%" and "." with " ")
+ufc_basics$Total.Strike.Accuracy<-gsub("%", "",as.character(ufc_basics$Total.Strike.Accuracy), fixed=TRUE)
+ufc_basics$Total.Strike.Accuracy<-gsub(".", "",as.character(ufc_basics$Total.Strike.Accuracy), fixed=TRUE)
+ufc_basics$Total.Strike.Accuracy<-gsub("-", "0", ufc_basics$Total.Strike.Accuracy, fixed=TRUE)
+#Now coerce the characters to numerics and divide the number by 1000
+ufc_basics$Total.Strike.Accuracy<-as.numeric(ufc_basics$Total.Strike.Accuracy)/10000
+
+#Do the same with takedown accuracy
+ufc_basics$Take.Down.Accuracy<-gsub("%", "", as.character(ufc_basics$Take.Down.Accuracy), fixed=TRUE)
+ufc_basics$Take.Down.Accuracy<-gsub(".", "", ufc_basics$Take.Down.Accuracy, fixed=TRUE)
+ufc_basics$Take.Down.Accuracy<-gsub("-", "0", ufc_basics$Take.Down.Accuracy, fixed=TRUE)
+#Now coerce the characters to numerics and divide the number by 1000
+ufc_basics$Take.Down.Accuracy<-as.numeric(ufc_basics$Take.Down.Accuracy)/10000
+
+#Coerce Name, Lastname and Firstname to characters
+ufc_basics$Name <- as.character(ufc_basics$Name)
+ufc_basics$Last.Name <- as.character(ufc_basics$Last.Name)
+ufc_basics$Firstst.Name<-as.character(ufc_basics$Firstst.Name)
+colnames(ufc_basics)[2] <- "Last.Name"
+colnames(ufc_basics)[3] <- "First.Name"
+colnames(ufc_basics)[10] <- "Pass"
+colnames(ufc_basics)[12] <- "Submission"
+
 # Define UI for application that plots features of movies
 ui <- fluidPage(
      #Add a theme
