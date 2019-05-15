@@ -1,5 +1,5 @@
 # UFC Fighter Data Shiny App
-Marcus scraped the data from Fox Sports I built the App
+Data is scraped from Fox Sports 
 
 The scraped data is stored in the "ufcbasics.csv" file
 
